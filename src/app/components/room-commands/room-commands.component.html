@@ -1,0 +1,12 @@
+<div id="player-list">
+    <h1>Utenti in Stanza</h1>
+    <div class="player" *ngFor="let n of players" [attr.data-uid]="n.id">{{n.userName}}</div>
+</div>
+<div id="comand-list">
+    <div *ngIf="isGm()">
+        <button (click)="closeRoom()">Chiudi Stanza</button>
+    </div>
+    <div *ngIf="!isGm()">
+        <button (click)="leaveRoom()">Lascia la Stanza</button>
+    </div>
+</div>

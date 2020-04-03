@@ -1,0 +1,27 @@
+h1{
+    text-align: center;
+    font-style: italic;
+}
+#channels-box{
+    display: flex;
+    flex-flow: column-reverse;
+    overflow-y: auto;
+    max-height: 70%;
+}
+.channel{
+    padding-left: 10px;
+    margin: 10px 0px;
+    cursor: pointer;
+}
+.channel:hover{
+    text-decoration: underline;
+    color: red;
+}
+#big-right-box {
+    height: 100%;
+}
+
+#button-box {
+    text-align: center;
+    margin-top: 10px;
+}

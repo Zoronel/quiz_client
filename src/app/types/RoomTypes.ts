@@ -1,0 +1,2 @@
+export type roomLite = { roomName: string, roomId: number, roomPlayer: number, roomIsLobby: boolean }
+export type roomInfo = { roomName: string, roomId: number, roomQuestion: string, roomGm: string, roomGmId: string, roomIsLobby: boolean }

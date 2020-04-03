@@ -1,0 +1,33 @@
+<div id="room-main-box">
+    <h1>{{name}}</h1>
+    <div *ngIf="!isLobby" id="room">
+
+        <div id="current-question-box">
+            <p>{{question}}</p>
+        </div>
+        <div *ngIf="!isGM" id="player-button-box">
+            <div id="big-friendly-button" (click)="sendAnswer()">RISPONDI!</div>
+        </div>
+        <div *ngIf="isGM" id="question-input-box">
+            <p>PLACEHOLDER - Input insert new Question</p>
+        </div>
+        <div *ngIf="isGM" id="booking-box">
+            <div *ngFor="let p of bookingList; let i = index"
+                [ngClass]="{'first':bookingList.first() == p, 'last':bookingList.last() == p}"
+                (click)="allowResponse(p.playerId)">
+                <i>#{{i+1}}</i><br>{{p.playerName}}</div>
+        </div>
+    </div>
+    <div *ngIf="isLobby" id="lobby">
+        <div *ngFor="let n of players" [attr.data-uid]="n.id">{{n.userName}}</div>
+    </div>
+</div>
+<app-dialog *ngIf="isGM" id="confirmAllowUser">
+    <h1>Autorizzare l'utente a rispondere?</h1>
+    <div>
+        <form #f="ngForm" (ngSubmit)="">
+            <button type="submit" value="true">Conferma</button>
+            <button type="submit" value="false">Annulla</button>
+        </form>
+    </div>
+</app-dialog>

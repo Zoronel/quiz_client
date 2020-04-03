@@ -1,0 +1,49 @@
+* {
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+  }
+
+  #big-box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+  }
+
+  #tv-box {
+    background-color: darkred;
+    width: 80%;
+    min-height: 600px;
+  }
+
+  .tv-part {
+    width: 100%;
+  }
+
+  #header,
+  #footer {
+    height: 30px;
+  }
+
+  #body {
+    min-height: 540px;
+    display: grid;
+    grid-template-columns: 30px auto 20% 30px;
+    grid-template-rows: 100%;
+  }
+
+  #screen {
+    background-color: #c1c1ff;
+    padding: 20px;
+  }
+
+  .tv-border {
+    background-color: grey;
+  }
+
+  #header p{
+    padding-top: 5px;
+    padding-left: 30px;
+  }

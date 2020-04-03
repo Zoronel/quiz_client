@@ -1,0 +1,19 @@
+<h1>{{currentRoom}}</h1>
+<div id="big-right-box">
+
+    <div *ngIf="isGuest" id="channels-box">
+        <div class="channel" *ngFor="let c of channels">
+            <!-- <span (click)="gotoChannel(c)">{{c}}</span> -->
+            <p>{{c.roomName}} <i>({{c.roomPlayer}})</i></p>
+        </div>
+    </div>
+    <div *ngIf="!isGuest" id="channels-box">
+        <div class="channel" *ngFor="let c of channels">
+            <!-- <span (click)="gotoChannel(c)">{{c}}</span> -->
+            <span (click)="moveTo(c.roomId)">{{c.roomName}} <i>({{c.roomPlayer}})</i></span>
+        </div>
+    </div>
+    <div *ngIf="!isGuest" id="button-box">
+        <button [routerLink]="['newroom']">Aggiungi una Stanza</button>
+    </div>
+</div>

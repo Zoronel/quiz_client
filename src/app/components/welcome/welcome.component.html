@@ -1,0 +1,9 @@
+<div id="welcome-box">
+    <h1>Benvenuto! Inserisci un Nickname per iniziare!</h1>
+    <div>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+            <input name="userName" ngModel #userName="ngModel">
+            <button type="submit">Conferma</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<div id="newroom-box">
+    <h1>Inserisci il nome della nuova partita e la prima domanda</h1>
+    <div>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+            <div class="form-part">
+                <label for="roomName">Nome Stanza</label>
+                <input id="roomName" name="roomName" ngModel #roomName="ngModel" required maxlength="20">
+            </div>
+            <div class="form-part">
+                <label for="roomQuestion">Prima Domanda</label>
+                <textarea id="roomQuestion" name="roomQuestion" ngModel #roomQuestion="ngModel" required
+                    placeholder="Domanda" maxlength="200"></textarea>
+            </div>
+            <button type="submit">Conferma</button>
+        </form>
+    </div>
+</div>

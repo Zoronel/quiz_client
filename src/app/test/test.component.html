@@ -1,0 +1,10 @@
+<p>test works! {{userName}}</p>
+<p>{{dataAttuale.toUTCString()}}</p>
+<p>{{mezzaData.toUTCString()}}</p>
+<button (click)="calcDate()">Che giorno è oggi?</button>
+<button (click)="goTo('home')">Goto Home</button>
+<button (click)="goTo('')">Nulla Scintillante[cit]</button>
+
+<ul>
+    <li *ngFor="let d of exposedTimer | async">{{d}}</li>
+</ul>

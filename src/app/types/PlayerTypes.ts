@@ -1,0 +1,1 @@
+export type playerLite = { id: string, userName: String, currentRoomId: number }
