@@ -33,6 +33,14 @@ app-dialog {
             height: 50%;
             border: 5px solid black;
             border-radius: 20px;
+            position: relative;
+
+            .dialog-close-button{
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                cursor: pointer
+            }
         }
     }
 
@@ -52,7 +60,15 @@ app-dialog {
         z-index: 900;
     }
 }
-
+app-dialog#infoDialog .dialog-body{
+    border-color: #0031e2
+}
+app-dialog#errorDialog .dialog-body{
+    border-color: #e40000
+}
+app-dialog#warningDialog .dialog-body{
+    border-color: #ffa600
+}
 body.dialog-open {
     /* body overflow is hidden to hide main scrollbar when modal window is open */
     overflow: hidden;

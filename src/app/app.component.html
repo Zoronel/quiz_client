@@ -25,6 +25,35 @@
   </div>
 </div>
 
-<app-dialog id='testDialog'>
+<!-- <app-dialog id='testDialog'>
   <p>test Dialog</p>
+  <button (click)="closeTest(true)">Close</button>
+  <button (click)="closeTest(false)">Nested</button>
+</app-dialog>
+<app-dialog id='testDialog2'>
+  <p>test Dialog 2</p>
+</app-dialog> -->
+
+<app-dialog id='infoDialog' #globalInfoDialog>
+  <h1>{{(globalInfoDialog.options?.title || "Attenzione")}}</h1>
+  <p>{{globalInfoDialog.options?.message || "[no message given]"}}</p>
+</app-dialog>
+
+<app-dialog id="warningDialog" #globalWarningDialog>
+  <h1>{{(globalWarningDialog.options?.title || "Attenzione!!")}}</h1>
+  <p>{{globalWarningDialog.options?.message || "[no message given]"}}</p>
+</app-dialog>
+
+<app-dialog id="errorDialog" #globalErrorDialog>
+  <h1>{{(globalErrorDialog.options?.title || "Errore!")}}</h1>
+  <p>{{globalErrorDialog.options?.message || "[no message given]"}}</p>
+</app-dialog>
+
+<app-dialog id="askDialog" #globalAskDialog>
+  <h1>{{globalAskDialog.options?.title || "Confermi?"}}</h1>
+  <p>{{globalAskDialog.options?.message || "[no message given]"}}</p>
+  <div>
+    <button (click)="globalAskDialog.close(true)">Si</button>
+    <button (click)="globalAskDialog.close(false)">No</button>
+  </div>
 </app-dialog>

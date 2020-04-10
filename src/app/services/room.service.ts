@@ -18,6 +18,11 @@ export class RoomService {
   private _roomUsersObs: BehaviorSubject<playerLite[]> = new BehaviorSubject<playerLite[]>([])
   private _roomQuestionObs: BehaviorSubject<string> = new BehaviorSubject<string>('')
   private _roomBooking: Subject<{ playerId: string, timeBooking: number }> = new Subject<{ playerId: string, timeBooking: number }>()
+  private _roomPlayerIsTyping: BehaviorSubject<{ playerId: string, typing: boolean }> = new BehaviorSubject<{ playerId: string, typing: boolean }>({ playerId: '', typing: false })
+  private _roomGmIsTyping: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+  private _roomPlayerAnswer: Subject<{ playerId: string, answer: string }> = new Subject<{ playerId: string, answer: string }>()
+  private _roomAnswerUpdate: Subject<{ found: boolean, playerId: string, answerWas?: string }> = new Subject<{ found: boolean, playerId: string, answerWas?: string }>()
+  private _roomPlayerSurrender: Subject<string> = new Subject<string>()
 
   constructor(
     private connection: ConnectionService,
@@ -35,12 +40,36 @@ export class RoomService {
           this._roomUsersObs.next(data.data.players)
           break;
         case 'new_question':
-          this._roomQuestionObs.next(data)
+          this._roomQuestionObs.next(data.data)
           this._reservetionSended = false
+          break
+        case 'typing':
+          this._roomPlayerIsTyping.next({ playerId: data.data, typing: true })
+          break
+        case 'gm_typing':
+          this._roomGmIsTyping.next(true)
+          break
+        case 'stop_typing':
+          this._roomPlayerIsTyping.next({ playerId: data.data, typing: false })
+          break
+        case 'gm_stop_typing':
+          this._roomGmIsTyping.next(false)
           break
         case 'player_reservation':
           console.log('Player reservation received', data.data)
           this._roomBooking.next(data.data)
+          break
+        case 'new_answer':
+          this._roomPlayerAnswer.next(data.data)
+          break
+        case 'player_surrender':
+          this._roomPlayerSurrender.next(data.data)
+          break
+        case 'answer_found':
+          this._roomAnswerUpdate.next({ found: true, playerId: data.data.playerId, answerWas: data.data.answer })
+          break
+        case 'answer_not_found':
+          this._roomAnswerUpdate.next({ found: false, playerId: data.data.playerId })
           break
         default:
           console.error('Event', data.event, 'non gestito', data)
@@ -58,8 +87,23 @@ export class RoomService {
   public get question(): BehaviorSubject<string> {
     return this._roomQuestionObs
   }
+  public get playerIsTyping(): BehaviorSubject<{ playerId: string; typing: boolean; }> {
+    return this._roomPlayerIsTyping
+  }
+  public get gmIsTyping(): BehaviorSubject<boolean> {
+    return this._roomGmIsTyping
+  }
   public get reservations(): Subject<{ playerId: string, timeBooking: number }> {
     return this._roomBooking
+  }
+  public get playersAnswer(): Subject<{ playerId: string, answer: string }> {
+    return this._roomPlayerAnswer
+  }
+  public get playerSurrender(): Subject<string> {
+    return this._roomPlayerSurrender
+  }
+  public get answerUpdate(): Subject<{ found: boolean, playerId: string, answerWas?: string }> {
+    return this._roomAnswerUpdate
   }
 
   public setRoom(id: number) {
@@ -72,18 +116,6 @@ export class RoomService {
   public newRoom(roomName: string, roomQuestion: string, roomGmId: string) {
     const thisEvent = new SocketEvent('add_room', 'Room', { roomName: roomName, roomQuestion: roomQuestion, roomGmId: roomGmId })
     this.connection.emit(thisEvent)
-  }
-
-  public sendReservation(): void {
-    if (this._reservetionSended) return
-    this._reservetionSended = true
-    const evt = new SocketEvent('room_booking', 'Room', { roomId: this._info.roomId })
-    this.connection.emit(evt)
-  }
-
-  public allowResponse(playerId: string): void {
-    const evt = new SocketEvent('allow_answer', 'Room', { roomId: this._info.roomId, playerId: playerId })
-    this.connection.emit(evt)
   }
 
   public closeRoom(): void {

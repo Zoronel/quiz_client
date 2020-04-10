@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ConnectionService } from './services/connection.service';
 import { PlayerService } from './services/player.service';
 import { RoomService } from './services/room.service';
+import { DialogService } from './services/dialog.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit {
   constructor(
     private connection: ConnectionService,
     private player: PlayerService,
-    private room: RoomService
+    private room: RoomService,
+    private dialogs: DialogService
   ) { }
 
   ngOnInit() {
@@ -45,7 +47,4 @@ export class AppComponent implements OnInit {
     return this._isLobby
   }
 
-  // public toggleDialog(evt) {
-  //   console.log(evt)
-  // }
 }

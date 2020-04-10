@@ -6,28 +6,54 @@
             <p>{{question}}</p>
         </div>
         <div *ngIf="!isGM" id="player-button-box">
-            <div id="big-friendly-button" (click)="sendAnswer()">RISPONDI!</div>
-        </div>
-        <div *ngIf="isGM" id="question-input-box">
-            <p>PLACEHOLDER - Input insert new Question</p>
+            <div *ngIf="!reservetionSended" id="big-friendly-button" (click)="sendAnswer()">RISPONDI!</div>
+            <div *ngIf="reservetionSended">Richiesta Inviata. Attendi</div>
+            <div *ngIf="surrended">Ti sei arreso. Attendi la prossima domanda</div>
+            <div *ngIf="reservetionSended && gmIsTyping">Il GM sta inserendo la nuova domanda</div>
         </div>
         <div *ngIf="isGM" id="booking-box">
             <div *ngFor="let p of bookingList; let i = index"
                 [ngClass]="{'first':bookingList.first() == p, 'last':bookingList.last() == p}"
                 (click)="allowResponse(p.playerId)">
-                <i>#{{i+1}}</i><br>{{p.playerName}}</div>
+                <i>#{{i+1}}</i><br>{{p.playerName}}<span *ngIf="p.isTyping"><br><i>Sta scrivendo...</i></span></div>
         </div>
     </div>
     <div *ngIf="isLobby" id="lobby">
         <div *ngFor="let n of players" [attr.data-uid]="n.id">{{n.userName}}</div>
     </div>
 </div>
-<app-dialog *ngIf="isGM" id="confirmAllowUser">
-    <h1>Autorizzare l'utente a rispondere?</h1>
+
+<app-dialog *ngIf="isGM" id="confirmAllowUser" #dialogConfirm>
+    <h1>Autorizzare {{(dialogConfirm.options?.userName||"[username not given]")}} a rispondere?</h1>
     <div>
-        <form #f="ngForm" (ngSubmit)="">
-            <button type="submit" value="true">Conferma</button>
-            <button type="submit" value="false">Annulla</button>
-        </form>
+        <button value="true" (click)="dialogConfirm.close(true)">Conferma</button>
+        <button value="false" (click)="dialogConfirm.close(false)">Annulla</button>
+    </div>
+</app-dialog>
+<app-dialog *ngIf="isGM" id="newAsnwer" #newAnswerDialog>
+    <h1>L'utente {{newAnswerDialog.options?.playerName || '[username not given]'}} ha inviato la seguente risposta</h1>
+    <p>{{newAnswerDialog.options?.answer||'[no answer given]'}}</p>
+    <div>
+        <button value="true" (click)="newAnswerDialog.close(true)">Corretto</button>
+        <button value="false" (click)="newAnswerDialog.close(false)">Errato</button>
+    </div>
+</app-dialog>
+<app-dialog *ngIf="isGM" id="newQuestion" #newQuestionDialog>
+    <h1>Inserisci la nuova domanda</h1>
+    <textarea #newQuestion placeholder="Domanda" maxlength="200"></textarea>
+    <div>
+        <button type="submit" (click)="newQuestionDialog.close({continue:true, question:newQuestion.value})">Invia nuova
+            Domanda</button>
+        <button type="submit" (click)="newQuestionDialog.close({continue:false})">Chiudi stanza</button>
+    </div>
+</app-dialog>
+
+<app-dialog *ngIf="!isGM" id="answerInput" #answerInput>
+    <h1>Inserisci la risposta</h1>
+    <p>{{question}}</p>
+    <input id="answer" #answer (input)="startTyping()" (keyup)="checkTyping()" (change)="stopTyping()" />
+    <div>
+        <button type="submit" (click)="answerInput.close({result:true, answer:answer.value})">Conferma</button>
+        <button type="submit" (click)="answerInput.close({result:false, answer:answer.value})">Arrenditi</button>
     </div>
 </app-dialog>

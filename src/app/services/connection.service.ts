@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { SocketEvent } from 'src/app/classes/socket-event';
 import { Subject, Observable } from 'rxjs';
+import { DialogService } from './dialog.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class ConnectionService {
   // private connectionSubject
   constructor(
     private router: Router,
+    private dialogs: DialogService
   ) {
     console.log('Connection Service Ready')
     this.connection = client.connect(this.connectionString, {
@@ -50,6 +52,7 @@ export class ConnectionService {
   private newEvent(data: { hasOwnProperty: (arg0: string) => any; type: string; name: string; data: any; }) {
     if (typeof (data) != 'object' || !data.hasOwnProperty('type')) {
       console.error('Response data is Invalid')
+      this.dialogs.error('Errore nella risposta da parte del server')
     } else {
       console.log('Routing new server event', data)
       const type: string = data.type!
@@ -67,7 +70,7 @@ export class ConnectionService {
           this.globalEvent.next(thisEvent)
           break
         default:
-          console.log('Type', type, 'non gestito')
+          console.warn('Type', type, 'non gestito')
       }
     }
   }
@@ -84,7 +87,7 @@ export class ConnectionService {
         return this.globalEvent.asObservable()
         break;
       default:
-        console.log('Type', serviceName, 'non gestito')
+        console.warn('Type', serviceName, 'non gestito')
     }
   }
 

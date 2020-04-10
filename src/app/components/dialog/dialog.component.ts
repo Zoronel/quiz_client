@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewEncapsulation, Input, OnDestroy, Output, EventEmitter, HostBinding } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, OnDestroy, HostBinding } from '@angular/core';
 import { DialogService } from 'src/app/services/dialog.service';
-import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-dialog',
@@ -10,46 +9,68 @@ import { NgForm } from '@angular/forms';
 })
 export class DialogComponent implements OnInit, OnDestroy {
   @Input() public id: string
-  @HostBinding('class.open') get isOpne() { return this._showing }
+  @HostBinding('class.open') get isOpen() { return this._showing }
   @HostBinding('class.closed') get isClosed() { return !this._showing }
 
   private _showing: boolean = false
 
-  private _onOpen: () => void
-  private _onClose: (data: any) => void
+  private _onOpen: () => boolean | void
+  private _onClose: (data: any) => boolean | void
 
-  // public showing: boolean
-  public title: string
-  public options: any
+  public options: { [key: string]: any }
 
   constructor(
     private dialog: DialogService
   ) { }
 
   ngOnInit(): void {
+    console.log('Init Dialog', this.id)
     this.dialog.add(this)
     this._showing = false
   }
   ngOnDestroy(): void {
+    console.log('Destroy Dialog', this.id)
     this.dialog.remove(this)
   }
-  public open(options: any, onOpen?: () => void, onClose?: (data: any) => void) {
+
+  public open(options?: { [key: string]: any }, onOpen?: () => boolean | void, onClose?: (data: any) => boolean | void) {
     this._onOpen = onOpen
     this._onClose = onClose
+    if (options == undefined) options = {}
+    if (Object.keys(options).length == 0 || !options.hasOwnProperty('hideClose')) options['hideClose'] = false
     this.options = options
-    this._showing = true
-    if (this._onOpen != undefined)
-      Function.call(this._onOpen)
-  }
-  public close(f?: NgForm): void {
-    this._showing = false
-    this.title = ''
-    this.options = undefined
-    if (this._onClose != undefined)
-      Function.call(this._onClose, f.value || undefined)
 
-    this._onOpen = undefined
-    this._onClose = undefined
+    let goOn: boolean = true
+    if (this._onOpen != undefined) {
+      const or = this._onOpen()
+      if (typeof or == 'boolean') goOn = or
+    }
+    if (goOn)
+      this._showing = true
+  }
+
+  public close(data?: any): void {
+    let goOn: boolean = true
+    if (this._onClose != undefined) {
+      const cr: boolean | void = this._onClose(data)
+      if (typeof cr == 'boolean') goOn = cr
+    }
+    if (goOn) {
+      this._showing = false
+
+      this.options = undefined
+      this._onOpen = undefined
+      this._onClose = undefined
+    }
+
+  }
+
+  public forceOpen() {
+    this._showing = true
+  }
+
+  public forceClose() {
+    this._showing = false
   }
 
 }

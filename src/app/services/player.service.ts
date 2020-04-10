@@ -13,6 +13,7 @@ export class PlayerService {
   static ROLE_PLAYER: number = 2
 
   private _userRoleUpdate: Subject<number> = new Subject<number>()
+  private _userAllowedAnswer: Subject<any> = new Subject<any>()
 
   private _userName: string
   private _role: number
@@ -49,6 +50,9 @@ export class PlayerService {
           // router.navigate(['room', 1])
           console.log('Leaving Room')
           break
+        case 'answer_allowed':
+          this._userAllowedAnswer.next(data.data)
+          break
         default:
           console.log('Event', data.event, 'non gestito')
       }
@@ -77,6 +81,9 @@ export class PlayerService {
   public get roleUpdate(): Observable<number> {
     return this._userRoleUpdate.asObservable()
   }
+  public get roomAnswerAllowed(): Subject<any> {
+    return this._userAllowedAnswer
+  }
 
   public connect(userName: string, role?: number): void {
     if (role == undefined) role = PlayerService.ROLE_ND
@@ -88,4 +95,5 @@ export class PlayerService {
     const moveEvent = new SocketEvent('move_player', 'RoomCollector', { playerId: this._id, destRoomId: destRoomId })
     this.connection.emit(moveEvent)
   }
+
 }
