@@ -14,15 +14,15 @@ export class RoomService {
   private _info: roomInfo
   private _reservetionSended: boolean = false
 
-  private _roomInfoObs: Subject<roomInfo> = new Subject<roomInfo>()
+  private _roomInfoObs: Subject<roomInfo> = new Subject
   private _roomUsersObs: BehaviorSubject<playerLite[]> = new BehaviorSubject<playerLite[]>([])
   private _roomQuestionObs: BehaviorSubject<string> = new BehaviorSubject<string>('')
-  private _roomBooking: Subject<{ playerId: string, timeBooking: number }> = new Subject<{ playerId: string, timeBooking: number }>()
-  private _roomPlayerIsTyping: BehaviorSubject<{ playerId: string, typing: boolean }> = new BehaviorSubject<{ playerId: string, typing: boolean }>({ playerId: '', typing: false })
-  private _roomGmIsTyping: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
-  private _roomPlayerAnswer: Subject<{ playerId: string, answer: string }> = new Subject<{ playerId: string, answer: string }>()
-  private _roomAnswerUpdate: Subject<{ found: boolean, playerId: string, answerWas?: string }> = new Subject<{ found: boolean, playerId: string, answerWas?: string }>()
-  private _roomPlayerSurrender: Subject<string> = new Subject<string>()
+  private _roomBooking: Subject<{ playerId: string, timeBooking: number }> = new Subject
+  private _roomPlayerIsTyping: Subject<string> = new Subject
+  private _roomGmIsTyping: Subject<void> = new Subject
+  private _roomPlayerAnswer: Subject<{ playerId: string, answer: string }> = new Subject
+  private _roomAnswerUpdate: Subject<{ found: boolean, playerId: string, answerWas?: string }> = new Subject
+  private _roomPlayerSurrender: Subject<string> = new Subject
 
   constructor(
     private connection: ConnectionService,
@@ -44,16 +44,10 @@ export class RoomService {
           this._reservetionSended = false
           break
         case 'typing':
-          this._roomPlayerIsTyping.next({ playerId: data.data, typing: true })
+          this._roomPlayerIsTyping.next(data.data)
           break
         case 'gm_typing':
-          this._roomGmIsTyping.next(true)
-          break
-        case 'stop_typing':
-          this._roomPlayerIsTyping.next({ playerId: data.data, typing: false })
-          break
-        case 'gm_stop_typing':
-          this._roomGmIsTyping.next(false)
+          this._roomGmIsTyping.next()
           break
         case 'player_reservation':
           console.log('Player reservation received', data.data)
@@ -87,10 +81,10 @@ export class RoomService {
   public get question(): BehaviorSubject<string> {
     return this._roomQuestionObs
   }
-  public get playerIsTyping(): BehaviorSubject<{ playerId: string; typing: boolean; }> {
+  public get playerIsTyping(): Subject<string> {
     return this._roomPlayerIsTyping
   }
-  public get gmIsTyping(): BehaviorSubject<boolean> {
+  public get gmIsTyping(): Subject<void> {
     return this._roomGmIsTyping
   }
   public get reservations(): Subject<{ playerId: string, timeBooking: number }> {

@@ -25,7 +25,7 @@
 
 <app-dialog *ngIf="isGM" id="confirmAllowUser" #dialogConfirm>
     <h1>Autorizzare {{(dialogConfirm.options?.userName||"[username not given]")}} a rispondere?</h1>
-    <div>
+    <div class="button-box">
         <button value="true" (click)="dialogConfirm.close(true)">Conferma</button>
         <button value="false" (click)="dialogConfirm.close(false)">Annulla</button>
     </div>
@@ -33,17 +33,17 @@
 <app-dialog *ngIf="isGM" id="newAsnwer" #newAnswerDialog>
     <h1>L'utente {{newAnswerDialog.options?.playerName || '[username not given]'}} ha inviato la seguente risposta</h1>
     <p>{{newAnswerDialog.options?.answer||'[no answer given]'}}</p>
-    <div>
+    <div class="button-box">
         <button value="true" (click)="newAnswerDialog.close(true)">Corretto</button>
         <button value="false" (click)="newAnswerDialog.close(false)">Errato</button>
     </div>
 </app-dialog>
 <app-dialog *ngIf="isGM" id="newQuestion" #newQuestionDialog>
     <h1>Inserisci la nuova domanda</h1>
-    <textarea #newQuestion placeholder="Domanda" maxlength="200" (input)="startTyping()" (keyup)="checkTyping()"
-        (change)="stopTyping()"></textarea>
+    <textarea [(ngModel)]="newQuestionDialog.values['newQuestion']" #newQuestion placeholder="Domanda" maxlength="200"
+        (input)="startTyping()"></textarea>
     <span>{{200- newQuestion.value?.length}}/200</span>
-    <div>
+    <div class="button-box">
         <button type="submit" (click)="newQuestionDialog.close({continue:true, question:newQuestion.value})">Invia nuova
             Domanda</button>
         <button type="submit" (click)="newQuestionDialog.close({continue:false})">Chiudi stanza</button>
@@ -53,9 +53,11 @@
 <app-dialog *ngIf="!isGM" id="answerInput" #answerInput>
     <h1>Inserisci la risposta</h1>
     <p>{{question}}</p>
-    <input id="answer" #answer (input)="startTyping()" (keyup)="checkTyping()" (change)="stopTyping()" />
-    <div>
-        <button type="submit" (click)="answerInput.close({result:true, answer:answer.value})">Conferma</button>
-        <button type="submit" (click)="answerInput.close({result:false, answer:answer.value})">Arrenditi</button>
+    <input id="answer" [(ngModel)]="answerInput.values['answer']" (input)="startTyping()" />
+    <div class="button-box">
+        <button type="submit"
+            (click)="answerInput.close({result:true, answer:answerInput.values.answer})">Conferma</button>
+        <button type="submit"
+            (click)="answerInput.close({result:false, answer:answerInput.values.answer})">Arrenditi</button>
     </div>
 </app-dialog>

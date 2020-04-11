@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { roomInfo } from 'src/app/types/RoomTypes';
-import { playerLite } from 'src/app/types/PlayerTypes';
+import { interval, Subject, Subscription } from 'rxjs';
+import { throttle } from 'rxjs/operators';
 import { SocketEvent } from 'src/app/classes/socket-event';
-import { RoomService } from 'src/app/services/room.service';
-import { PlayerService } from 'src/app/services/player.service';
-import { DialogService } from 'src/app/services/dialog.service';
 import { ConnectionService } from 'src/app/services/connection.service';
+import { DialogService } from 'src/app/services/dialog.service';
+import { PlayerService } from 'src/app/services/player.service';
+import { RoomService } from 'src/app/services/room.service';
+import { playerLite } from 'src/app/types/PlayerTypes';
+import { roomInfo } from 'src/app/types/RoomTypes';
 
 @Component({
   selector: 'app-room',
@@ -16,7 +17,8 @@ import { ConnectionService } from 'src/app/services/connection.service';
 })
 export class RoomComponent implements OnInit, OnDestroy {
 
-  private s: Subscription
+  private _typingSubj: Subject<void> = new Subject
+
   private subCollector: Subscription[] = []
 
   private _roomName: string = ''
@@ -26,9 +28,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   private _playerList: playerLite[] = []
   private _roomGmName: string = ''
   private _roomGmId: string = ''
-
-  private _isTyping: boolean = false
-  private _typingEmit: boolean = false
 
   private _bookingList: { playerId: string, timestampBooking: number, playerName: String, isTyping: boolean }[] = []
 
@@ -87,12 +86,16 @@ export class RoomComponent implements OnInit, OnDestroy {
                 if (confirm) this.openNewQuestion()
               }
             )
-            // openNewQuestion()
           } else {
             this.dialogs.info('Il giocatore ' + surrendedPlayer.userName + ' si è arreso. Scegli qualcun\'altro per rispondere', 'Attenzine')
           }
         }
       }
+    }))
+
+    this.subCollector.push(this._typingSubj.pipe(throttle(() => interval(2000))).subscribe(() => {
+      console.log('Send typing')
+      this.connection.emit(new SocketEvent('typing', 'Room'))
     }))
 
     this.subCollector.push(this.thisRoute.paramMap.subscribe(params => {
@@ -118,10 +121,19 @@ export class RoomComponent implements OnInit, OnDestroy {
           return 0
         })
       }))
+
+      let typingTimeout: any
       this.subCollector.push(this.roomService.playerIsTyping.subscribe((data) => {
-        const bookedPlayer = this._bookingList.find(p => p.playerId == data.playerId)
-        if (bookedPlayer) bookedPlayer.isTyping = data.typing
+        const bookedPlayer = this._bookingList.find(p => p.playerId == data)
+        if (bookedPlayer) {
+          clearTimeout(typingTimeout)
+          bookedPlayer.isTyping = true
+          typingTimeout = setTimeout(() => {
+            bookedPlayer.isTyping = false
+          }, 2000)
+        }
       }))
+
       this.subCollector.push(this.roomService.playersAnswer.subscribe((data) => {
         const bookedPlayer = this._bookingList.find(p => p.playerId == data.playerId)
         const answer = data.answer.trim()
@@ -168,9 +180,16 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.dialogs.info('Non sei stato selezionato per rispondere. Risponderà l\'utente ' + data.allowedUser, 'Spiacente')
         }
       }))
-      this.subCollector.push(this.roomService.gmIsTyping.subscribe((data: boolean) => {
-        this.gmIsTyping = data
+
+      let typingTimeout: any
+      this.subCollector.push(this.roomService.gmIsTyping.subscribe(() => {
+        clearTimeout(typingTimeout)
+        this.gmIsTyping = true
+        typingTimeout = setTimeout(() => {
+          this.gmIsTyping = false
+        }, 2000)
       }))
+
       this.subCollector.push(this.roomService.answerUpdate.subscribe(data => {
         const thatPlayerName: String = this._playerList.find(p => p.id == data.playerId)?.userName || '[user not found]'
         if (data.found) {
@@ -222,24 +241,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   public startTyping(): void {
-    this._isTyping = true
-    if (!this._typingEmit) {
-      this._typingEmit = true
-      this.connection.emit(new SocketEvent('typing', 'Room'))
-    }
+    this._typingSubj.next()
   }
-  public checkTyping(): void {
-    this._isTyping = false
-    setTimeout(() => {
-      if (!this._isTyping) {
-        this.stopTyping()
-        this._typingEmit = false
-      }
-    }, 3000)
-  }
-  public stopTyping(): void {
-    this.connection.emit(new SocketEvent('stop_typing', 'Room'))
-  }
+
   /* PALYER ONLY */
 
   public sendAnswer(): void {

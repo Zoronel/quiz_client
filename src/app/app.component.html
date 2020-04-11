@@ -1,10 +1,3 @@
-<!-- <div>
-  <app-test [userName]="'Gino'" (oggi)="oggi($event)"></app-test>
-</div>
-
-<br><br>
-<br><br>
-<br><br> -->
 <div id="big-box">
   <div id="tv-box">
     <div class="tv-part tv-border" id="header">
@@ -25,15 +18,6 @@
   </div>
 </div>
 
-<!-- <app-dialog id='testDialog'>
-  <p>test Dialog</p>
-  <button (click)="closeTest(true)">Close</button>
-  <button (click)="closeTest(false)">Nested</button>
-</app-dialog>
-<app-dialog id='testDialog2'>
-  <p>test Dialog 2</p>
-</app-dialog> -->
-
 <app-dialog id='infoDialog' #globalInfoDialog>
   <h1>{{(globalInfoDialog.options?.title || "Attenzione")}}</h1>
   <p>{{globalInfoDialog.options?.message || "[no message given]"}}</p>
@@ -52,7 +36,7 @@
 <app-dialog id="askDialog" #globalAskDialog>
   <h1>{{globalAskDialog.options?.title || "Confermi?"}}</h1>
   <p>{{globalAskDialog.options?.message || "[no message given]"}}</p>
-  <div>
+  <div class="button-box">
     <button (click)="globalAskDialog.close(true)">Si</button>
     <button (click)="globalAskDialog.close(false)">No</button>
   </div>
