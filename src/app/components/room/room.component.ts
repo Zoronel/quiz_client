@@ -10,6 +10,11 @@ import { RoomService } from 'src/app/services/room.service';
 import { playerLite } from 'src/app/types/PlayerTypes';
 import { roomInfo } from 'src/app/types/RoomTypes';
 
+window.clearTimeout = window.clearTimeout.bind(window);
+window.clearInterval = window.clearInterval.bind(window);
+window.setTimeout = window.setTimeout.bind(window);
+window.setInterval = window.setInterval.bind(window);
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
