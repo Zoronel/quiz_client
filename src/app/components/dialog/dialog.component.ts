@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input, OnDestroy, HostBinding } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, OnDestroy, HostBinding, AfterViewInit, ElementRef } from '@angular/core';
 import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
@@ -7,20 +7,22 @@ import { DialogService } from 'src/app/services/dialog.service';
   styleUrls: ['./dialog.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DialogComponent implements OnInit, OnDestroy {
+export class DialogComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() public id: string
   @HostBinding('class.open') get isOpen() { return this._showing }
   @HostBinding('class.closed') get isClosed() { return !this._showing }
 
   private _showing: boolean = false
 
+  private _inputs: Node[] = []
   private _onOpen: () => boolean | void
   private _onClose: (data: any) => boolean | void
 
   public options: { [key: string]: any }
 
   constructor(
-    private dialog: DialogService
+    private dialog: DialogService,
+    private elt: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -31,6 +33,14 @@ export class DialogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     console.log('Destroy Dialog', this.id)
     this.dialog.remove(this)
+  }
+  ngAfterViewInit() {
+    const items: NodeList = this.elt.nativeElement.childNodes[0].children[0].childNodes
+    items.forEach((n: Node) => {
+      if (n.nodeName == 'INPUT' || n.nodeName == 'TEXTAREA') {
+        this._inputs.push(n)
+      }
+    })
   }
 
   public open(options?: { [key: string]: any }, onOpen?: () => boolean | void, onClose?: (data: any) => boolean | void) {
@@ -45,8 +55,20 @@ export class DialogComponent implements OnInit, OnDestroy {
       const or = this._onOpen()
       if (typeof or == 'boolean') goOn = or
     }
-    if (goOn)
+    if (goOn) {
+      for (const n of this._inputs) {
+        let thatElem: any
+        if (n.nodeName == 'INPUT') {
+          thatElem = <HTMLInputElement>n
+        } else if (n.nodeName == 'TEXTAREA') {
+          thatElem = <HTMLTextAreaElement>n
+        } else {
+          continue
+        }
+        thatElem.value = ''
+      }
       this._showing = true
+    }
   }
 
   public close(data?: any): void {

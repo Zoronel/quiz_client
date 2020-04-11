@@ -40,7 +40,9 @@
 </app-dialog>
 <app-dialog *ngIf="isGM" id="newQuestion" #newQuestionDialog>
     <h1>Inserisci la nuova domanda</h1>
-    <textarea #newQuestion placeholder="Domanda" maxlength="200"></textarea>
+    <textarea #newQuestion placeholder="Domanda" maxlength="200" (input)="startTyping()" (keyup)="checkTyping()"
+        (change)="stopTyping()"></textarea>
+    <span>{{200- newQuestion.value?.length}}/200</span>
     <div>
         <button type="submit" (click)="newQuestionDialog.close({continue:true, question:newQuestion.value})">Invia nuova
             Domanda</button>

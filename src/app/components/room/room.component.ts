@@ -28,6 +28,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private _roomGmId: string = ''
 
   private _isTyping: boolean = false
+  private _typingEmit: boolean = false
 
   private _bookingList: { playerId: string, timestampBooking: number, playerName: String, isTyping: boolean }[] = []
 
@@ -222,12 +223,18 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   public startTyping(): void {
     this._isTyping = true
-    this.connection.emit(new SocketEvent('typing', 'Room'))
+    if (!this._typingEmit) {
+      this._typingEmit = true
+      this.connection.emit(new SocketEvent('typing', 'Room'))
+    }
   }
   public checkTyping(): void {
     this._isTyping = false
     setTimeout(() => {
-      if (!this._isTyping) this.stopTyping()
+      if (!this._isTyping) {
+        this.stopTyping()
+        this._typingEmit = false
+      }
     }, 3000)
   }
   public stopTyping(): void {

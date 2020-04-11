@@ -5,11 +5,13 @@
             <div class="form-part">
                 <label for="roomName">Nome Stanza</label>
                 <input id="roomName" name="roomName" ngModel #roomName="ngModel" required maxlength="20">
+                <span>{{(20 -roomName.value?.length)}}/20</span>
             </div>
             <div class="form-part">
                 <label for="roomQuestion">Prima Domanda</label>
                 <textarea id="roomQuestion" name="roomQuestion" ngModel #roomQuestion="ngModel" required
                     placeholder="Domanda" maxlength="200"></textarea>
+                <span>{{(200 - roomQuestion.value?.length)}}/200</span>
             </div>
             <button type="submit">Conferma</button>
         </form>

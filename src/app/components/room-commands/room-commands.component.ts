@@ -13,7 +13,7 @@ export class RoomCommandsComponent implements OnInit, OnDestroy {
   private s: Subscription
 
   private _playerRole: number = this.playerService.role
-  private _playerList: playerLite[]
+  private _playerList: playerLite[] = []
 
   constructor(
     private roomService: RoomService,
